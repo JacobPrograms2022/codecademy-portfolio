@@ -1,15 +1,12 @@
 # main executable for game
 import csv
 import random
+import json
 
-players = open("players.csv")
-players_dict_file = csv.DictReader(players)
-data = []
-for row in players_dict_file:
-    data.append(row)
 
-score = 0
+
 players_list = []
+
 class Player:
     def __init__(self, username, score = 0, games_won = 0, games_lost = 0):
         self.username = username
@@ -21,7 +18,15 @@ class Player:
             }
         players_list.append(self.player_dict)
         
+def find_data():
+    players = open("players.csv")
+    players_dict_file = csv.DictReader(players)
+    data = []
+    for row in players_dict_file:
+        data.append(row)
+    return data
 
+data = find_data()
 
 def create_player(username):
     player = Player(username)
@@ -31,9 +36,34 @@ def create_player(username):
         entries.writerow(player.player_dict)
         f.close()
 
-def hangman():
+def player_stats(username, data):
+    # finds player data and returns it
+    player_data = []
+    for i in data:
+        if i["Username"] == username:
+            player_data.append(i["Score"])
+            player_data.append(i["Games Won"])
+            player_data.append(i["Games Lost"])
+            break
+    return player_data
+
+def random_word():
+    with open("dinos.txt", "r") as f:
+        dinos = f.readlines()
+        word = dinos[random.randrange(0, len(dinos))]
+        return word
+
+def hangman(dino):
     # main logic of game
-    pass
+    incorrect_guesses = 0
+    with open("hangman.json", "r") as f:
+        figure = json.load(f)
+
+    win = False
+    print("Lets Play Hangman!\n")
+    board = ["_"]*len(dino)
+    print(board)
+    letters = list(dino)
 
 def end():
     # exit out of program
@@ -51,7 +81,21 @@ def main():
             option = int(input("-->: "))
 
             if option == 1:
-                username = input("Please type your username: ")
+                select = True
+                while select == True:
+                    username = input("Please type your username: ")
+                    if all(not data[name]["Username"] == username for name in range(len(data))):
+                        print("\n{name} does not exist.".format(name = username))
+                    else:
+                        select = False
+                        print("\nWelcome back, {name}.".format(name = username))
+                        player_data = player_stats(username, data)
+                        print("---------\nScore: {score}\nWins: {wins}\nLost: {lost}\n---------".format(
+                            score=player_data[0], wins=player_data[1], lost=player_data[2]
+                            ))
+                        
+                        hangman(dino=random_word())
+                            
 
             elif option == 2:
                 create = True
@@ -64,7 +108,7 @@ def main():
                         create_player(username)
                         create = False
                     else:
-                        print("Username already taken.")
+                        print("\nUsername already taken.")
                         
             
 
