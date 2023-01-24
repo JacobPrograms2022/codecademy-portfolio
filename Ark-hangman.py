@@ -51,7 +51,7 @@ def random_word():
     with open("dinos.txt", "r") as f:
         dinos = f.readlines()
         word = dinos[random.randrange(0, len(dinos))]
-        return word
+        return word.strip("\n")
 
 def hangman(dino):
     # main logic of game
@@ -62,8 +62,45 @@ def hangman(dino):
     win = False
     print("Lets Play Hangman!\n")
     board = ["_"]*len(dino)
-    print(board)
     letters = list(dino)
+    
+    # replaces spaces in the board with actual spaces and ticks them off
+    space = " "
+    if space in board:
+        space_index = letters.index(space)
+        board[space_index] = space
+        letters[space_index] = "%"
+    print((" ".join(board)))
+
+    # main game loop
+    while incorrect_guesses < len(figure):
+        guess = input("\nGuess a letter: ")
+        if guess in letters:
+            while guess in letters:
+                guess_index = letters.index(guess)
+                board[guess_index] = guess
+                letters[guess_index] = "%"
+
+        elif guess == "end":
+            break
+
+        else:
+            incorrect_guesses += 1
+            # prints hangman image
+            print("\n\n\n '{letter}' was not correct!".format(letter=guess))
+            print("\n{image}".format(image=figure[str(incorrect_guesses)]))
+        
+        print((" ".join(board)))
+
+        if "_" not in board or guess == dino:
+            print("\nYou win! It was:\n {dino}!\n".format(dino=dino.title()))
+            win = True
+            break
+
+    if not win:
+        print("\nGame Over! Word was: \n{}\n".format(dino=dino.title()))
+
+
 
 def end():
     # exit out of program
@@ -94,7 +131,7 @@ def main():
                             score=player_data[0], wins=player_data[1], lost=player_data[2]
                             ))
                         
-                        hangman(dino=random_word())
+                        hangman(dino=random_word().lower())
                             
 
             elif option == 2:
