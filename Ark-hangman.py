@@ -55,50 +55,59 @@ def random_word():
 
 def hangman(dino):
     # main logic of game
-    incorrect_guesses = 0
-    with open("hangman.json", "r") as f:
-        figure = json.load(f)
+    play = True
+    while play == True:
+        incorrect_guesses = 0
+        with open("hangman.json", "r") as f:
+            figure = json.load(f)
 
-    win = False
-    print("Lets Play Hangman!\n")
-    board = ["_"]*len(dino)
-    letters = list(dino)
-    
-    # replaces spaces in the board with actual spaces and ticks them off
-    space = " "
-    if space in board:
-        space_index = letters.index(space)
-        board[space_index] = space
-        letters[space_index] = "%"
-    print((" ".join(board)))
-
-    # main game loop
-    while incorrect_guesses < len(figure):
-        guess = input("\nGuess a letter: ")
-        if guess in letters:
-            while guess in letters:
-                guess_index = letters.index(guess)
-                board[guess_index] = guess
-                letters[guess_index] = "%"
-
-        elif guess == "end":
-            break
-
-        else:
-            incorrect_guesses += 1
-            # prints hangman image
-            print("\n\n\n '{letter}' was not correct!".format(letter=guess))
-            print("\n{image}".format(image=figure[str(incorrect_guesses)]))
+        win = False
+        print("\nLets Play Hangman!\n")
+        board = ["_"]*len(dino)
+        letters = list(dino)
         
+        # replaces spaces in the board with actual spaces and ticks them off
+        space = " "
+        if space in board:
+            space_index = letters.index(space)
+            board[space_index] = space
+            letters[space_index] = "%"
         print((" ".join(board)))
 
-        if "_" not in board or guess == dino:
-            print("\nYou win! It was:\n {dino}!\n".format(dino=dino.title()))
-            win = True
-            break
+        # main game loop
+        while incorrect_guesses < len(figure):
+            guess = input("\nGuess a letter: ")
+            if guess in letters:
+                while guess in letters:
+                    guess_index = letters.index(guess)
+                    board[guess_index] = guess
+                    letters[guess_index] = "%"
 
-    if not win:
-        print("\nGame Over! Word was: \n{}\n".format(dino=dino.title()))
+            elif guess == "end":
+                break
+
+            else:
+                incorrect_guesses += 1
+                # prints hangman image
+                print("\n\n\n '{letter}' was not correct!".format(letter=guess))
+                print("\n{image}".format(image=figure[str(incorrect_guesses)]))
+            
+            print((" ".join(board)))
+
+            if "_" not in board or guess == dino:
+                print("\nYou win! It was:\n {dino}!\n".format(dino=dino.title()))
+                win = True
+
+        if not win:
+            print("\nGame Over! Word was: \n{dino}\n".format(dino=dino.title()))
+
+        again = input("\nPlay Again?(y/n): ")
+        if again == "n":
+            play = False
+            end()
+        else:
+            continue
+
 
 
 
@@ -144,11 +153,12 @@ def main():
                     if all(not data[name]["Username"] == username for name in range(len(data))):
                         create_player(username)
                         create = False
+                        print("\nWelcome to hangman, {name}.".format(name=username))
+                        hangman(dino=random_word().lower())
+
                     else:
                         print("\nUsername already taken.")
                         
-            
-
             else:
                 print("Option not recognised.")
             
