@@ -159,41 +159,46 @@ def main():
         if play == "y":
             print("\nWelcome to Ark Hangman!")
             print("Select Player: 1\nCreate Player: 2")
-            option = int(input("-->: "))
-
-            if option == 1:
-                select = True
-                while select == True:
-                    username = input("Please type your username: ")
-                    if all(not data[name]["Username"] == username for name in range(len(data))):
-                        print("\n{name} does not exist.".format(name = username))
-                    else:
-                        select = False
-                        print("\nWelcome back, {name}.".format(name = username))
-                        player_data = player_stats(username, data)
-                        print("---------\nScore: {score}\nWins: {wins}\nLost: {lost}\n---------".format(
-                            score=player_data[0], wins=player_data[1], lost=player_data[2]
-                            ))
-                        play_game(username)
-                            
-            elif option == 2:
-                create = True
-                while create == True:
-
-                    username = input("Please create a username: ")
-                    username.strip().lower()
-
-                    if all(not data[name]["Username"] == username for name in range(len(data))):
-                        create_player(username)
-                        create = False
-                        print("\nWelcome to hangman, {name}.".format(name=username))
-                        play_game(username)
-                    else:
-                        print("\nUsername already taken.")
-                        
-            else:
-                print("Option not recognised.")
             
+            try:
+                option = int(input("-->: "))
+            except:
+                print("Integer not detected")
+            else:
+                if option == 1:
+                    select = True
+                    while select == True:
+                        username = input("Please type your username: ")
+                        if all(not data[name]["Username"] == username for name in range(len(data))):
+                            print("\n{name} does not exist.".format(name = username))
+                        else:
+                            select = False
+                            print("\nWelcome back, {name}.".format(name = username))
+                            player_data = player_stats(username, data)
+                            print("---------\nScore: {score}\nWins: {wins}\nLost: {lost}\n---------".format(
+                                score=player_data[0], wins=player_data[1], lost=player_data[2]
+                                ))
+                            play_game(username)
+
+                elif option == 2:
+                    create = True
+                    while create == True:
+
+                        username = input("Please create a username: ")
+                        username.strip().lower()
+
+                        if all(not data[name]["Username"] == username for name in range(len(data))):
+                            create_player(username)
+                            create = False
+                            print("\nWelcome to hangman, {name}.".format(name=username))
+                            play_game(username)
+                        else:
+                            print("\nUsername already taken.")
+
+                else:
+                    print("Option not recognised.")
+            
+
         elif play == "n":
             end()
         else:
