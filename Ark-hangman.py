@@ -2,6 +2,8 @@
 import csv
 import random
 import json
+from tempfile import NamedTemporaryFile
+import shutil
 
 class Player:
     def __init__(self, username, score = 0, games_won = 0, games_lost = 0):
@@ -12,7 +14,26 @@ class Player:
         self.player_dict = {
             "username":self.username, "score":self.score, "games_won": self.games_won, "games_lost": self.games_lost
             }
-        
+
+    def update_stats(self):
+        data = find_data()
+        user_data = [data[i] for i in range(len(data)) if data[i]["Username"] == self.username]
+        user_data = user_data[0]
+        old_score = int(user_data["Score"])
+        old_games_won = int(user_data["Games Won"])
+        old_games_lost = int(user_data["Games Lost"])
+        headers = ["Username", "Score", "Games Won", "Games Lost"]
+        tempfile = NamedTemporaryFile(mode="w", delete = False)
+        with open("players.csv", "r") as csvfile, tempfile:
+            reader = csv.DictReader(csvfile, fieldnames=headers)
+            writer = csv.DictWriter(tempfile, fieldnames=headers)
+            for row in reader:
+                if row['Username'] == self.username:
+                    print('updating row', row['Username'])
+                    row['Username'], row['Score'], row['Games Won'], row["Games Lost"] = self.username, self.score+old_score, self.games_won+old_games_won, self.games_lost+old_games_lost
+                row = {'Username': row['Username'], 'Score': row['Score'], 'Games Won': row['Games Won'], 'Games Lost': row['Games Lost']}
+                writer.writerow(row)
+        shutil.move(tempfile.name, "players.csv")
         
 def find_data():
     # Reads CSV file and stores each line in the data list
@@ -35,11 +56,12 @@ def create_player(username):
         entries.writerow(player.player_dict)
         f.close()
 
-def update_stats():
-    pass
+
+
+
 
 def player_stats(username, data):
-    # finds player data and returns it
+    # finds player data from csv file and returns it
     player_data = []
     for i in data:
         if i["Username"] == username:
@@ -63,6 +85,9 @@ def random_word():
 
 def hangman(dino):
     # main logic of game
+    global current_score, games_won, games_lost
+    games_won = 0
+    games_lost = 0
     current_score = 0
     incorrect_guesses = 0
     with open("hangman.json", "r") as f:
@@ -102,11 +127,13 @@ def hangman(dino):
             print("\nYou win! It was:\n {dino}!\n".format(dino=dino.title()))
             win = True
             current_score += 120-(incorrect_guesses*10)
+            games_won += 1
             print("Score:",current_score)
             return
             
     if not win:
         print("\nGame Over! Word was: \n{dino}\n".format(dino=dino.title()))
+        games_lost += 1
         return
     
 
@@ -136,6 +163,8 @@ def main():
                         play = True
                         while play == True:
                             hangman(dino=random_word().lower())
+                            new_stats = Player(username, current_score, games_won, games_lost)
+                            new_stats.update_stats()
                             again = input("\nPlay Again?(y/n): ")
                             if again == "n":
                                 play = False
@@ -157,6 +186,8 @@ def main():
                         play = True
                         while play == True:
                             hangman(dino=random_word().lower())
+                            new_stats = Player(username, current_score, games_won, games_lost)
+                            new_stats.update_stats()
                             again = input("\nPlay Again?(y/n): ")
                             if again == "n":
                                 play = False
