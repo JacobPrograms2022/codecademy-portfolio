@@ -29,7 +29,6 @@ class Player:
             writer = csv.DictWriter(tempfile, fieldnames=headers)
             for row in reader:
                 if row['Username'] == self.username:
-                    print('updating row', row['Username'])
                     row['Username'], row['Score'], row['Games Won'], row["Games Lost"] = self.username, self.score+old_score, self.games_won+old_games_won, self.games_lost+old_games_lost
                 row = {'Username': row['Username'], 'Score': row['Score'], 'Games Won': row['Games Won'], 'Games Lost': row['Games Lost']}
                 writer.writerow(row)
@@ -99,7 +98,7 @@ def hangman(dino):
     
     # replaces spaces in the board with actual spaces and ticks them off
     space = " "
-    if space in board:
+    if space in dino:
         space_index = letters.index(space)
         board[space_index] = space
         letters[space_index] = "%"
