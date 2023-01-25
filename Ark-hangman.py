@@ -89,7 +89,7 @@ def hangman(dino):
     with open("hangman.json", "r") as f:
         figure = json.load(f)
     win = False
-    print("\nLets Play Hangman!\n")
+    print("Lets Play Hangman!\n")
     board = ["_"]*len(dino)
     letters = list(dino)
     
@@ -128,14 +128,28 @@ def hangman(dino):
             win = True
             current_score += 120-(incorrect_guesses*10)
             games_won += 1
-            print("Score:",current_score)
             return
             
     if not win:
         print("\nGame Over! Word was: \n{dino}\n".format(dino=dino.title()))
         games_lost += 1
         return
-    
+
+def play_game(username):
+    play = True
+    while play == True:
+        hangman(dino=random_word().lower())
+        new_stats = Player(username, current_score, games_won, games_lost)
+        new_stats.update_stats()
+        new_data = find_data()
+        stats = player_stats(username, new_data)
+        print("User: {user}\nScore: {score}\nGames Won: {wins}\nGames Lost: {loss}".format(user=username,score=stats[0], wins=stats[1], loss=stats[2]))
+        again = input("\nPlay Again?(y/n): ")
+        if again == "n":
+            play = False
+            end()
+        else:
+            continue
 
 def main():
     # the loop that the game resides and general menu statements
@@ -160,17 +174,7 @@ def main():
                         print("---------\nScore: {score}\nWins: {wins}\nLost: {lost}\n---------".format(
                             score=player_data[0], wins=player_data[1], lost=player_data[2]
                             ))
-                        play = True
-                        while play == True:
-                            hangman(dino=random_word().lower())
-                            new_stats = Player(username, current_score, games_won, games_lost)
-                            new_stats.update_stats()
-                            again = input("\nPlay Again?(y/n): ")
-                            if again == "n":
-                                play = False
-                                end()
-                            else:
-                                continue
+                        play_game(username)
                             
             elif option == 2:
                 create = True
@@ -183,18 +187,7 @@ def main():
                         create_player(username)
                         create = False
                         print("\nWelcome to hangman, {name}.".format(name=username))
-                        play = True
-                        while play == True:
-                            hangman(dino=random_word().lower())
-                            new_stats = Player(username, current_score, games_won, games_lost)
-                            new_stats.update_stats()
-                            again = input("\nPlay Again?(y/n): ")
-                            if again == "n":
-                                play = False
-                                end()
-                            else:
-                                continue
-
+                        play_game(username)
                     else:
                         print("\nUsername already taken.")
                         
@@ -206,4 +199,3 @@ def main():
         else:
             print("Option not recognised.")
 main()
-
