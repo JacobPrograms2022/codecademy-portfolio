@@ -55,10 +55,6 @@ def create_player(username):
         entries.writerow(player.player_dict)
         f.close()
 
-
-
-
-
 def player_stats(username, data):
     # finds player data from csv file and returns it
     player_data = []
@@ -89,6 +85,7 @@ def hangman(dino):
     games_lost = 0
     current_score = 0
     incorrect_guesses = 0
+    letters_guessed = []
     with open("hangman.json", "r") as f:
         figure = json.load(f)
     win = False
@@ -102,11 +99,12 @@ def hangman(dino):
         space_index = letters.index(space)
         board[space_index] = space
         letters[space_index] = "%"
-    print((" ".join(board)))
+    print((" ".join(board)), "        Guesses: ", " ".join(letters_guessed))
     # main game loop
     while incorrect_guesses < len(figure):
         guess = input("\nGuess a letter: ")
-        if guess in letters:
+        if guess in letters and not guess in letters_guessed:
+            letters_guessed.append(guess)
             while guess in letters:
                 guess_index = letters.index(guess)
                 board[guess_index] = guess
@@ -114,13 +112,16 @@ def hangman(dino):
                 current_score += 10
         elif guess == "end":
             break
+        elif guess in letters_guessed:
+            print("\nYou have already guessed '{guess}'.".format(guess = guess))
         else:
+            letters_guessed.append(guess)
             incorrect_guesses += 1
             # prints hangman image
             print("\n\n\n '{letter}' was not correct!".format(letter=guess))
             print("\n{image}".format(image=figure[str(incorrect_guesses)]))
         
-        print((" ".join(board)))
+        print((" ".join(board)),"        Guesses: ", " ".join(letters_guessed))
         print("Score:",current_score)
         if "_" not in board or guess == dino:
             print("\nYou win! It was:\n {dino}!\n".format(dino=dino.title()))
