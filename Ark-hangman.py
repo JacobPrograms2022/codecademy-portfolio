@@ -168,9 +168,11 @@ def main():
                 if option == 1:
                     select = True
                     while select == True:
-                        username = input("Please type your username: ")
-                        if all(not data[name]["Username"] == username for name in range(len(data))):
+                        username = input("\nGo Back(b)\nPlease type your username: ")
+                        if all(not data[name]["Username"] == username for name in range(len(data))) and not username == "b":
                             print("\n{name} does not exist.".format(name = username))
+                        if username == "b":
+                            break
                         else:
                             select = False
                             print("\nWelcome back, {name}.".format(name = username))
@@ -187,11 +189,13 @@ def main():
                         username = input("Please create a username: ")
                         username.strip().lower()
 
-                        if all(not data[name]["Username"] == username for name in range(len(data))):
+                        if all(not data[name]["Username"] == username for name in range(len(data))) and not username == "b":
                             create_player(username)
                             create = False
                             print("\nWelcome to hangman, {name}.".format(name=username))
                             play_game(username)
+                        elif username == "b":
+                            break
                         else:
                             print("\nUsername already taken.")
 
